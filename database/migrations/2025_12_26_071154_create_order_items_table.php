@@ -9,28 +9,24 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
+   public function up()
+{
+    if (!Schema::hasTable('order_items')) {
         Schema::create('order_items', function (Blueprint $table) {
-    $table->id();
-    $table->foreignId('order_id')->constrained()->onDelete('cascade');
-    $table->foreignId('product_id')->constrained();
-
-    // PENTING: Snapshot data produk saat transaksi
-    $table->string('product_name'); // Simpan nama kalau-kalau produk dihapus/diubah
-    $table->integer('quantity');
-    $table->decimal('price', 12, 2); // Simpan harga SAAT transaksi, bukan relasi ke harga produk sekarang
-    $table->decimal('subtotal', 12, 2); // quantity * price
-
-    $table->timestamps();
-});
+            $table->id();
+            $table->foreignId('order_id')->constrained()->onDelete('cascade');
+            $table->foreignId('product_id')->constrained()->onDelete('cascade');
+            $table->string('product_name');
+            $table->integer('quantity');
+            $table->decimal('price', 12, 2);
+            $table->decimal('subtotal', 12, 2);
+            $table->timestamps();
+        });
     }
+}
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::dropIfExists('order_items');
-    }
+public function down()
+{
+    Schema::dropIfExists('order_items');
+}
 };

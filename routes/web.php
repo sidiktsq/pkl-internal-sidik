@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\ProductController;
 
 
 Route::get('/', function () {
@@ -186,7 +187,7 @@ Auth::routes();
 // routes/web.php
 
 use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\ProductController;
+
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     // Kategori
@@ -207,4 +208,69 @@ Route::get('/product/{slug}', [CatalogController::class, 'show'])->name('catalog
 Route::middleware('auth')->group(function() {
     Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
     Route::post('/wishlist/toggle/{product}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+});
+
+// routes/web.php
+
+use App\Http\Controllers\PaymentController;
+
+Route::middleware('auth')->group(function () {
+    // ... routes lainnya
+
+    // Payment Routes
+    Route::get('/orders/{order}/pay', [PaymentController::class, 'show'])
+        ->name('orders.pay');
+    Route::get('/orders/{order}/success', [PaymentController::class, 'success'])
+        ->name('orders.success');
+    Route::get('/orders/{order}/pending', [PaymentController::class, 'pending'])
+        ->name('orders.pending');
+});
+
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Halaman Tentang Kami
+Route::get('/tentang-kami', function () {
+    return view('about');
+})->name('about');
+
+// Halaman Kontak
+Route::get('/kontak', function () {
+    return view('contact');
+})->name('contact');
+
+// Halaman Katalog
+Route::get('/katalog', [ProductController::class, 'index'])->name('catalog.index');
+
+// Frontend catalog routes
+Route::get('/katalog', [\App\Http\Controllers\ProductController::class, 'index'])->name('catalog.index');
+
+// Catalog routes
+Route::get('/katalog/{slug}', [\App\Http\Controllers\ProductController::class, 'show'])->name('catalog.show');
+
+// Admin product routes
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+    Route::resource('products', \App\Http\Controllers\Admin\ProductController::class)->except(['show']);
+});
+
+
+// routes/web.php
+
+use App\Http\Controllers\MidtransNotificationController;
+
+// ============================================================
+// MIDTRANS WEBHOOK
+// Route ini HARUS public (tanpa auth middleware)
+// Karena diakses oleh SERVER Midtrans, bukan browser user
+// ============================================================
+Route::post('midtrans/notification', [MidtransNotificationController::class, 'handle'])
+    ->name('midtrans.notification');
+
+// routes/web.php
+
+
+Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+    // ... rute admin lainnya ...
+    
+    // Tambahkan rute untuk produk
+    Route::resource('products', ProductController::class)->names('admin.products');
 });

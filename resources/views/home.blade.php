@@ -5,8 +5,6 @@
 
 @extends('layouts.app')
 
-@section('title', 'Beranda')
-
 @section('content')
     {{-- Hero Section --}}
     <section class="bg-primary text-white py-5">
@@ -37,24 +35,30 @@
         <div class="container">
             <h2 class="text-center mb-4">Kategori Populer</h2>
             <div class="row g-4">
-                @foreach($categories as $category)
+                @forelse($categories as $category)
                     <div class="col-6 col-md-4 col-lg-2">
                         <a href="{{ route('catalog.index', ['category' => $category->slug]) }}"
                            class="text-decoration-none">
                             <div class="card border-0 shadow-sm text-center h-100">
                                 <div class="card-body">
+                                    @if($category->image_url)
                                     <img src="{{ $category->image_url }}"
                                          alt="{{ $category->name }}"
                                          class="rounded-circle mb-3"
                                          width="80" height="80"
                                          style="object-fit: cover;">
+                                    @endif
                                     <h6 class="card-title mb-0">{{ $category->name }}</h6>
-                                    <small class="text-muted">{{ $category->products_count }} produk</small>
+                                    <small class="text-muted">{{ $category->active_products_count }} produk</small>
                                 </div>
                             </div>
                         </a>
                     </div>
-                @endforeach
+                @empty
+                    <div class="col-12 text-center">
+                        <p class="text-muted">Tidak ada kategori yang tersedia.</p>
+                    </div>
+                @endforelse
             </div>
         </div>
     </section>
@@ -69,11 +73,15 @@
                 </a>
             </div>
             <div class="row g-4">
-                @foreach($featuredProducts as $product)
+                @forelse($featuredProducts as $product)
                     <div class="col-6 col-md-4 col-lg-3">
                         @include('partials.product-card', ['product' => $product])
                     </div>
-                @endforeach
+                @empty
+                    <div class="col-12 text-center">
+                        <p class="text-muted">Belum ada produk unggulan.</p>
+                    </div>
+                @endforelse
             </div>
         </div>
     </section>
@@ -111,14 +119,35 @@
     {{-- Produk Terbaru --}}
     <section class="py-5">
         <div class="container">
-            <h2 class="text-center mb-4">Produk Terbaru</h2>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">Produk Terbaru</h2>
+                <a href="{{ route('catalog.index', ['sort' => 'newest']) }}" class="btn btn-outline-primary">
+                    Lihat Semua <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
             <div class="row g-4">
-                @foreach($latestProducts as $product)
+                @forelse($latestProducts as $product)
                     <div class="col-6 col-md-4 col-lg-3">
                         @include('partials.product-card', ['product' => $product])
                     </div>
-                @endforeach
+                @empty
+                    <div class="col-12 text-center">
+                        <p class="text-muted">Belum ada produk terbaru.</p>
+                    </div>
+                @endforelse
             </div>
         </div>
     </section>
 @endsection
+
+@push('scripts')
+    <script>
+        // Inisialisasi tooltip
+        document.addEventListener('DOMContentLoaded', function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        });
+    </script>
+@endpush

@@ -48,19 +48,19 @@ class OrderService
                 $totalAmount += $item->product->price * $item->quantity;
             }
 
-            // B. BUAT HEADER ORDER
-            $order = Order::create([
-                'user_id' => $user->id,
-                // Generate Order Number Unik. Contoh: ORD-X7Y8Z9A1B2
-                'order_number' => 'ORD-' . strtoupper(Str::random(10)),
-                'status' => 'pending',
-                'payment_status' => 'unpaid',
-                'shipping_name' => $shippingData['name'],
-                'shipping_address' => $shippingData['address'],
-                'shipping_phone' => $shippingData['phone'],
-                'total_amount' => $totalAmount,
-            ]);
-
+           // B. BUAT HEADER ORDER
+$order = Order::create([
+    'user_id' => $user->id,
+    // Generate Order Number Unik. Contoh: ORD-X7Y8Z9A1B2
+    'order_number' => 'ORD-' . strtoupper(Str::random(10)),
+    'status' => 'pending',
+    'payment_status' => 'unpaid',  // Ini sudah benar
+    'shipping_name' => $shippingData['name'],
+    'shipping_address' => $shippingData['address'],
+    'shipping_phone' => $shippingData['phone'],
+    'total_amount' => $totalAmount,
+    'shipping_cost' => 0,  // Tambahkan ini jika kolom shipping_cost ada
+]);
             // C. PINDAHKAN ITEMS
             foreach ($cart->items as $item) {
                 // Buat Order Item

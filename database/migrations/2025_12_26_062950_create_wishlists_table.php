@@ -13,24 +13,19 @@ return new class extends Migration
 
 public function up()
 {
-    Schema::create('wishlists', function (Blueprint $table) {
-        $table->id();
-        // Foreign Key ke User
-        $table->foreignId('user_id')->constrained()->onDelete('cascade');
-        // Foreign Key ke Product
-        $table->foreignId('product_id')->constrained()->onDelete('cascade');
-        $table->timestamps();
-
-        // Mencegah duplikasi: User yang sama tidak bisa wishlist produk yang sama 2x
-        $table->unique(['user_id', 'product_id']);
-    });
+    if (!Schema::hasTable('wishlists')) {
+        Schema::create('wishlists', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('product_id')->constrained()->onDelete('cascade');
+            $table->timestamps();
+            $table->unique(['user_id', 'product_id']);
+        });
+    }
 }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::dropIfExists('wishlists');
-    }
+public function down()
+{
+    Schema::dropIfExists('wishlists');
+}
 };

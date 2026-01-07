@@ -3,80 +3,52 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\User;
-use App\Models\Product;     
-use App\Models\Category;
 use App\Models\Order;
+use App\Models\Product;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-           $stats = [
-            'users'           => User::count(),
-            'products'        => Product::count(),
-            'categories'      => Category::count(),
-            'total_orders'    => Order::count(),
-            'total_revenue'   => Order::sum('total_amount'),
-            'pending_orders'  => Order::where('status', 'pending')->count(),
-            'low_stock'       => Product::where('stock', '<', 5)->count(),
+        // 1. Hitung statistik
+        $stats = [
+            'total_revenue' => Order::where('status', 'completed')->sum('total_amount'),
+            'pending_orders' => Order::where('status', 'pending')->count(),
+            'total_orders' => Order::count(),
+            'total_products' => Product::count(),
+            'total_customers' => User::where('role', 'user')->count(),
         ];
 
-        // Ambil 5 order terbaru
-        $recentOrders = Order::latest()->take(5)->get();
-        return view('admin.dashboard', compact('stats', 'recentOrders'));
-    }
+        // 2. Ambil pesanan terbaru
+        $recentOrders = Order::with(['user', 'items'])
+            ->latest()
+            ->take(5)
+            ->get();
 
+        // 3. Produk terlaris
+        $topProducts = Product::withCount(['orderItems as sold_count' => function($query) {
+            $query->select(DB::raw('COALESCE(SUM(quantity), 0)'))
+                  ->whereHas('order', function($q) {
+                      $q->where('payment_status', 'paid');
+                  });
+        }])
+        ->orderBy('sold_count', 'desc')
+        ->take(5)
+        ->get();
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+        // 4. Data Grafik Pendapatan (7 Hari Terakhir)
+        $revenueChart = Order::select([
+                DB::raw('DATE(created_at) as date'),
+                DB::raw('SUM(total_amount) as total')
+            ])
+            ->where('payment_status', 'paid')
+            ->where('created_at', '>=', now()->subDays(7))
+            ->groupBy('date')
+            ->orderBy('date', 'asc')
+            ->get();
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return view('admin.dashboard', compact('stats', 'recentOrders', 'topProducts', 'revenueChart'));
     }
 }

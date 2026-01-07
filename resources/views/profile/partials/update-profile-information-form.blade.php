@@ -85,3 +85,17 @@
 
     <button type="submit" class="btn btn-primary">Simpan Informasi</button>
 </form>
+
+@if (auth()->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && !auth()->user()->hasVerifiedEmail())
+    <div class="mt-2">
+        <p class="text-sm text-gray-600">
+            Email Anda belum diverifikasi.
+            <form method="POST" action="{{ route('verification.send') }}">
+                @csrf
+                <button type="submit" class="text-blue-600 hover:text-blue-500">
+                    Klik di sini untuk mengirim ulang email verifikasi
+                </button>
+            </form>
+        </p>
+    </div>
+@endif
