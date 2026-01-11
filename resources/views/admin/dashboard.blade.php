@@ -3,297 +3,274 @@
 @section('title', 'Dashboard Admin')
 
 @section('content')
-<div class="container-fluid px-4">
-    <h1 class="mt-4">Dashboard</h1>
-    
-    <!-- Stats Cards -->
-    <div class="row mt-4">
-        <!-- Total Revenue Card -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Total Pendapatan</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                Rp {{ number_format($stats['total_revenue'] ?? 0, 0, ',', '.') }}
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<style>
+    :root {
+        --sidebar-bg: #1e293b;
+        --sidebar-active: rgba(255, 255, 255, 0.1);
+        --bg-main: #f1f5f9;
+        --text-main: #334155;
+        --text-muted: #64748b;
+        --accent: #6366f1;
+    }
 
-        <!-- Pending Orders Card -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Pending Orders</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {{ $stats['pending_orders'] ?? 0 }}
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-comments fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    body {
+        background-color: var(--bg-main);
+        color: var(--text-main);
+        font-family: 'Inter', -apple-system, sans-serif;
+    }
 
-        <!-- Total Products Card -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Total Produk</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {{ $stats['total_products'] ?? 0 }}
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-boxes fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    /* --- Dashboard Cards --- */
+    .card-dashboard {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        background: #fff;
+    }
 
-        <!-- Total Customers Card -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                Total Pelanggan</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {{ $stats['total_customers'] ?? 0 }}
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-users fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    .icon-shape {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
 
-    <!-- Recent Orders -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                    <h6 class="m-0 font-weight-bold text-primary">Pesanan Terbaru</h6>
-                    <a href="{{ route('admin.orders.index') }}" class="btn btn-sm btn-primary">Lihat Semua</a>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered" width="100%" cellspacing="0">
-                            <thead>
-                                <tr>
-                                    <th>Order #</th>
-                                    <th>Pelanggan</th>
-                                    <th>Total</th>
-                                    <th>Tanggal</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if(isset($recentOrders) && $recentOrders->count() > 0)
-                                    @foreach($recentOrders as $order)
-                                        <tr>
-                                            <td>{{ $order->order_number ?? 'N/A' }}</td>
-                                            <td>{{ $order->user->name ?? 'Guest' }}</td>
-                                            <td>Rp {{ number_format($order->total_amount ?? 0, 0, ',', '.') }}</td>
-                                            <td>{{ $order->created_at ? $order->created_at->format('d M Y H:i') : 'N/A' }}</td>
-                                            <td>
-                                                @php
-                                                    $statusClass = [
-                                                        'pending' => 'warning',
-                                                        'processing' => 'info',
-                                                        'completed' => 'success',
-                                                        'cancelled' => 'danger'
-                                                    ][$order->status ?? 'pending'] ?? 'secondary';
-                                                @endphp
-                                                <span class="badge bg-{{ $statusClass }}">
-                                                    {{ ucfirst($order->status ?? 'N/A') }}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                @else
-                                    <tr>
-                                        <td colspan="5" class="text-center">Tidak ada pesanan terbaru</td>
-                                    </tr>
-                                @endif
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+    /* --- Pagination --- */
+    .custom-pagination {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        border-radius: 6px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+    }
+
+    .page-link-custom {
+        padding: 6px 14px;
+        background: white;
+        border-right: 1px solid #e2e8f0;
+        color: #4f46e5;
+        text-decoration: none;
+        font-size: 0.85rem;
+    }
+
+    .page-link-custom:last-child { border-right: none; }
+
+    .page-link-custom.active {
+        background: #1e293b;
+        color: white;
+        border-color: #1e293b;
+    }
+
+    .page-link-custom.next-prev {
+        color: #4f46e5;
+        font-weight: 500;
+    }
+
+    /* --- Table & Chart --- */
+    .table-responsive {
+        border-radius: 8px;
+        border: 1px solid #eef2f7;
+    }
+
+    .table thead th {
+        background-color: #f8fafc;
+        text-transform: uppercase;
+        font-size: 0.7rem;        letter-spacing: 0.025em;
+        color: #64748b;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .chart-container {
+        height: 300px;
+        position: relative;
+    }
+</style>
+
+<div class="container-fluid p-4">
+    <div class="row align-items-center mb-4">
+        <div class="col">
+            <h4 class="fw-bold mb-0">Overview Dashboard</h4>
+            <p class="text-muted small mb-0">Selamat datang kembali, Admin.</p>
+        </div>
+        <div class="col-auto">
+            <div class="bg-white border rounded-3 px-3 py-2 small fw-medium">
+                <i class="far fa-calendar me-2 text-primary"></i> {{ now()->format('d M Y') }}
             </div>
         </div>
     </div>
 
-    <!-- Top Products & Revenue Chart -->
-    <div class="row">
-        <!-- Top Products -->
-        <div class="col-xl-6 col-lg-6">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Produk Terlaris</h6>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered" width="100%" cellspacing="0">
-                            <thead>
-                                <tr>
-                                    <th>Produk</th>
-                                    <th>Terjual</th>
-                                    <th>Pendapatan</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($topProducts ?? [] as $product)
-                                    <tr>
-                                        <td>{{ $product->name }}</td>
-                                        <td>{{ $product->sold_count ?? 0 }} pcs</td>
-                                        <td>Rp {{ number_format(($product->price ?? 0) * ($product->sold_count ?? 0), 0, ',', '.') }}</td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="3" class="text-center">Tidak ada data produk</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+    <div class="row g-3 mb-4">
+        @php
+            $stats_data = [
+                ['label' => 'Total Pendapatan', 'val' => 'Rp ' . number_format($stats['total_revenue'] ?? 0, 0, ',', '.'), 'icon' => 'fa-wallet', 'color' => '#4f46e5'],
+                ['label' => 'Pesanan Baru', 'val' => ($stats['pending_orders'] ?? 0) . ' Pesanan', 'icon' => 'fa-shopping-cart', 'color' => '#f59e0b'],
+                ['label' => 'Produk Aktif', 'val' => $stats['total_products'] ?? 58, 'icon' => 'fa-box', 'color' => '#10b981'],
+                ['label' => 'Pelanggan', 'val' => $stats['total_customers'] ?? 0, 'icon' => 'fa-users', 'color' => '#06b6d4'],
+            ];
+        @endphp
+
+        @foreach($stats_data as $s)
+        <div class="col-md-3">
+            <div class="card card-dashboard p-3">
+                <div class="d-flex align-items-center">
+                    <div class="icon-shape me-3" style="background-color: {{ $s['color'] }}15; color: {{ $s['color'] }};">
+                        <i class="fas {{ $s['icon'] }}"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted small fw-medium text-uppercase mb-0" style="font-size: 0.65rem;">{{ $s['label'] }}</div>
+                        <div class="h6 fw-bold mb-0">{{ $s['val'] }}</div>
                     </div>
                 </div>
             </div>
         </div>
+        @endforeach
+    </div>
 
-        <!-- Revenue Chart -->
-        <div class="col-xl-6 col-lg-6">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Pendapatan 7 Hari Terakhir</h6>
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            <div class="card card-dashboard p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h6 class="fw-bold mb-0">Grafik Penjualan 7 Hari Terakhir</h6>
+                    <button class="btn btn-sm btn-light border text-muted px-3" style="font-size: 0.75rem;">Laporan Mingguan</button>
                 </div>
-                <div class="card-body">
-                    <div class="chart-area">
-                        <canvas id="revenueChart"></canvas>
+                <div class="chart-container">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 mb-4">
+            <div class="card card-dashboard h-100 p-4">
+                <h6 class="fw-bold mb-4">Produk Terlaris</h6>
+                @forelse($topProducts ?? [] as $product)
+                <div class="d-flex align-items-center mb-3">
+                    <div class="flex-shrink-0 bg-light rounded-2 p-2 text-center" style="width: 40px;">
+                        <span class="small fw-bold text-primary">{{ substr($product->name, 0, 1) }}</span>
                     </div>
+                    <div class="ms-3 flex-grow-1">
+                        <div class="small fw-bold text-dark">{{ $product->name }}</div>
+                        <div class="text-muted" style="font-size: 0.7rem;">{{ $product->sold_count ?? 0 }} Terjual</div>
+                    </div>
+                    <div class="text-end small fw-bold">Rp{{ number_format($product->price ?? 0, 0, ',', '.') }}</div>
                 </div>
+                @empty
+                <div class="text-center py-5 text-muted small">Data tidak tersedia.</div>
+                @endforelse
+            </div>
+        </div>
+    </div>
+
+    <div class="card card-dashboard">
+        <div class="p-4 d-flex justify-content-between align-items-center">
+            <h6 class="fw-bold mb-0">Transaksi Terakhir</h6>
+            <div class="small text-muted">Showing {{ count($recentOrders ?? []) }} results</div>
+        </div>
+        <div class="table-responsive px-4">
+            <table class="table align-middle mb-3">
+                <thead>
+                    <tr>
+                        <th>ID Pesanan</th>
+                        <th>Nama Pelanggan</th>
+                        <th>Total Pembayaran</th>
+                        <th class="text-center">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($recentOrders ?? [] as $order)
+                    <tr>
+                        <td class="fw-bold text-primary small">#{{ $order->order_number }}</td>
+                        <td class="small">{{ $order->user->name ?? 'Guest' }}</td>
+                        <td class="small fw-bold">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</td>
+                        <td class="text-center">
+                            @php
+                                $status = strtolower($order->status);
+                                $badgeClass = 'bg-secondary';
+                                if($status == 'completed') $badgeClass = 'bg-success';
+                                elseif($status == 'processing') $badgeClass = 'bg-warning text-dark';
+                                elseif($status == 'pending') $badgeClass = 'bg-info text-dark';
+                            @endphp
+                            <span class="badge rounded-pill {{ $badgeClass }} px-3" style="font-size: 0.65rem;">
+                                {{ strtoupper($order->status) }}
+                            </span>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr><td colspan="4" class="text-center py-4">Belum ada pesanan masuk.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="p-4 pt-0 d-flex justify-content-between align-items-center mt-3">
+            <div class="small text-muted">Halaman 1 dari 1</div>
+            <div class="custom-pagination">
+                <a href="#" class="page-link-custom next-prev">Next &raquo;</a>
+                <a href="#" class="page-link-custom active">1</a>
             </div>
         </div>
     </div>
 </div>
-@endsection
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Revenue Chart
     document.addEventListener('DOMContentLoaded', function() {
         const ctx = document.getElementById('revenueChart').getContext('2d');
-        const revenueData = @json($revenueChart ?? []);
+        const rawData = @json($revenueChart ?? []);
         
-        const labels = revenueData.map(item => item.date);
-        const data = revenueData.map(item => item.total);
+        // Data dummy jika database kosong agar grafik tetap muncul garisnya
+        const labels = rawData.length > 0 ? rawData.map(item => item.date) : ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+        const dataValues = rawData.length > 0 ? rawData.map(item => item.total) : [0, 50000, 30000, 100000, 80000, 150000, 120000];
+
+        // Membuat gradient untuk area di bawah garis
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(99, 102, 241, 0.4)');
+        gradient.addColorStop(1, 'rgba(99, 102, 241, 0)');
 
         new Chart(ctx, {
-            type: 'line',
+            type: 'line', // Mengubah menjadi Line Chart
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Pendapatan (Rp)',
-                    data: data,
-                    backgroundColor: 'rgba(78, 115, 223, 0.05)',
-                    borderColor: 'rgba(78, 115, 223, 1)',
-                    pointRadius: 3,
-                    pointBackgroundColor: 'rgba(78, 115, 223, 1)',
-                    pointBorderColor: 'rgba(78, 115, 223, 1)',
-                    pointHoverRadius: 3,
-                    pointHoverBackgroundColor: 'rgba(78, 115, 223, 1)',
-                    pointHoverBorderColor: 'rgba(78, 115, 223, 1)',
-                    pointHitRadius: 10,
+                    label: 'Pendapatan',
+                    data: dataValues,
+                    borderColor: '#6366f1', // Warna garis ungu terang
+                    backgroundColor: gradient, // Warna isi di bawah garis
+                    fill: true, // Mengaktifkan pengisian area
+                    tension: 0.4, // Membuat garis melengkung (smooth)
+                    borderWidth: 4, // Ketebalan garis
+                    pointRadius: 4, // Ukuran titik
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#6366f1',
                     pointBorderWidth: 2,
-                    borderWidth: 2
+                    pointHoverRadius: 7
                 }]
             },
             options: {
+                responsive: true,
                 maintainAspectRatio: false,
-                layout: {
-                    padding: {
-                        left: 10,
-                        right: 25,
-                        top: 25,
-                        bottom: 0
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
                     }
                 },
                 scales: {
-                    x: {
-                        grid: {
-                            display: false,
-                            drawBorder: false
+                    y: { 
+                        beginAtZero: true,
+                        grid: { color: '#f1f5f9', drawBorder: false },
+                        ticks: { 
+                            font: { size: 11 },
+                            callback: val => 'Rp ' + val.toLocaleString('id-ID')
                         }
                     },
-                    y: {
-                        ticks: {
-                            maxTicksLimit: 5,
-                            padding: 10,
-                            callback: function(value) {
-                                return 'Rp ' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-                            }
-                        },
-                        grid: {
-                            color: "rgb(234, 236, 244)",
-                            zeroLineColor: "rgb(234, 236, 244)",
-                            drawBorder: false,
-                            borderDash: [2],
-                            zeroLineBorderDash: [2]
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: "rgb(255,255,255)",
-                        bodyColor: "#858796",
-                        titleMarginBottom: 10,
-                        titleFontColor: '#6e707e',
-                        titleFontSize: 14,
-                        borderColor: '#dddfeb',
-                        borderWidth: 1,
-                        xPadding: 15,
-                        yPadding: 15,
-                        displayColors: false,
-                        intersect: false,
-                        mode: 'index',
-                        caretPadding: 10,
-                        callbacks: {
-                            label: function(context) {
-                                var label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed.y !== null) {
-                                    label += 'Rp ' + context.parsed.y.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-                                }
-                                return label;
-                            }
-                        }
+                    x: { 
+                        grid: { display: false }, 
+                        ticks: { font: { size: 11 } } 
                     }
                 }
             }
@@ -301,3 +278,4 @@
     });
 </script>
 @endpush
+@endsection

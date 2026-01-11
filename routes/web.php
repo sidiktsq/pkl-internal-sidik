@@ -11,10 +11,11 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
-use App\Http\Controllers\ProductController;
+use App\Http\Controllers\Admin\ReportController;
+
 
 
 Route::get('/', function () {
@@ -62,7 +63,12 @@ Route::middleware('auth')->group(function () {
 
     Route::put('/profile', [ProfileController::class, 'update'])
         ->name('profile.update');
+
+         Route::patch('/profile/avatar', [ProfileController::class, 'updateAvatar'])
+    ->name('profile.avatar.update');
 });
+
+
 
 
 Route::middleware(['auth', 'admin'])
@@ -108,6 +114,8 @@ Route::controller(GoogleController::class)->group(function () {
     Route::get('/auth/google/callback', 'callback')
         ->name('auth.google.callback');
 });
+
+
 
 // routes/web.php
 
@@ -161,20 +169,23 @@ Route::middleware('auth')->group(function () {
 // HALAMAN ADMIN (Butuh Login + Role Admin)
 // ================================================
 
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     // Dashboard
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-
-    // Produk CRUD
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
+    // Products
     Route::resource('products', AdminProductController::class);
-
-    // Kategori CRUD
+    
+    // Categories
     Route::resource('categories', AdminCategoryController::class);
-
-    // Manajemen Pesanan
+    
+    // Orders
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
     Route::patch('/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.updateStatus');
+    // Reports
+    Route::get('/reports/sales', [\App\Http\Controllers\Admin\ReportController::class, 'sales'])->name('reports.sales');
+    Route::get('reports/sales/export', [ReportController::class, 'exportSales'])->name('reports.export-sales');
 });
 
 
@@ -273,4 +284,36 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     
     // Tambahkan rute untuk produk
     Route::resource('products', ProductController::class)->names('admin.products');
+
+      Route::get('/sales', [ReportController::class, 'sales'])->name('sales');
+        Route::get('/sales/export', [ReportController::class, 'exportSales'])->name('sales.export');
+
+});          
+
+
+// Di dalam group middleware web
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+    return back()->with('status', 'verification-link-sent');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+    return redirect('/home');
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+// Di dalam group middleware web
+Route::middleware('auth')->group(function () {
+    // ... route lainnya ...
+
+  
+        
+    // Route untuk melepas koneksi Google
+    Route::post('/profile/google/unlink', [\App\Http\Controllers\ProfileController::class, 'unlinkGoogle'])
+        ->name('profile.google.unlink');
 });
+

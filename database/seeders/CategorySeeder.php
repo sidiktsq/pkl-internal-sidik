@@ -1,50 +1,60 @@
 <?php
-// database/seeders/CategorySeeder.php
 
 namespace Database\Seeders;
 
 use App\Models\Category;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class CategorySeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     */
     public function run(): void
     {
         $categories = [
             [
-                'name' => 'Elektronik',
-                'slug' => 'elektronik',
-                'description' => 'Perangkat elektronik seperti smartphone, laptop, dan gadget lainnya',
+                'name' => 'Celana Abu-abu',
+                'slug' => 'celana-abu-abu',
+                'description' => 'Celana dengan warna abu-abu untuk seragam sekolah',
                 'is_active' => true,
             ],
             [
-                'name' => 'Fashion Pria',
-                'slug' => 'fashion-pria',
-                'description' => 'Pakaian, sepatu, dan aksesoris untuk pria',
+                'name' => 'Rok Abu-abu',
+                'slug' => 'rok-abu-abu',
+                'description' => 'Rok dengan warna abu-abu untuk seragam sekolah',
                 'is_active' => true,
             ],
             [
-                'name' => 'Fashion Wanita',
-                'slug' => 'fashion-wanita',
-                'description' => 'Pakaian, sepatu, dan aksesoris untuk wanita',
+                'name' => 'Kemeja Putih',
+                'slug' => 'kemeja-putih',
+                'description' => 'Kemeja putih berkualitas untuk seragam sekolah',
                 'is_active' => true,
             ],
             [
-                'name' => 'Makanan & Minuman',
-                'slug' => 'makanan-minuman',
-                'description' => 'Berbagai makanan ringan, minuman, dan bahan makanan',
+                'name' => 'Seragam Pramuka',
+                'slug' => 'seragam-pramuka',
+                'description' => 'Seragam pramuka dan perlengkapannya',
                 'is_active' => true,
             ],
             [
-                'name' => 'Kesehatan & Kecantikan',
-                'slug' => 'kesehatan-kecantikan',
-                'description' => 'Produk kesehatan, skincare, dan kosmetik',
+                'name' => 'Batik Sekolah',
+                'slug' => 'batik-sekolah',
+                'description' => 'Baju batik khusus untuk seragam sekolah',
                 'is_active' => true,
             ],
             [
-                'name' => 'Rumah Tangga',
-                'slug' => 'rumah-tangga',
-                'description' => 'Peralatan rumah tangga dan dekorasi',
+                'name' => 'Almamater',
+                'slug' => 'almamater',
+                'description' => 'Almamater dan produk sekolah lainnya',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Baju Praktek',
+                'slug' => 'baju-praktek',
+                'description' => 'Baju praktek untuk kegiatan laboratorium dan prakter lainnya di sekolah',
                 'is_active' => true,
             ],
         ];

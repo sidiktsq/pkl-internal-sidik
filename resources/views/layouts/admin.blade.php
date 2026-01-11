@@ -99,14 +99,14 @@
                     </li>
 
                     <li class="nav-item mt-3">
-                        <span class="nav-link text-muted small text-uppercase">Laporan</span>
+                        <span class="nav-link  small text-uppercase">Laporan</span>
                     </li>
 
                     <li class="nav-item">
-                        {{-- <a href="{{ route('admin.reports.sales') }}"
+                       <a href="{{ route('admin.reports.sales') }}"
                            class="nav-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
                             <i class="bi bi-graph-up me-2"></i> Laporan Penjualan
-                        </a> --}}
+                        </a> 
                     </li>
                 </ul>
             </nav>
