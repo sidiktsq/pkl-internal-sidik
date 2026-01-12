@@ -14,7 +14,7 @@ class DashboardController extends Controller
     {
         // 1. Hitung statistik
         $stats = [
-            'total_revenue' => Order::where('status', 'completed')->sum('total_amount'),
+            'total_revenue' => Order::where('payment_status', 'paid')->sum('total_amount'),
             'pending_orders' => Order::where('status', 'pending')->count(),
             'total_orders' => Order::count(),
             'total_products' => Product::count(),

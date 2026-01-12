@@ -5,123 +5,89 @@
 @section('content')
 <style>
     :root {
-        --sidebar-bg: #1e293b;
-        --sidebar-active: rgba(255, 255, 255, 0.1);
-        --bg-main: #f1f5f9;
-        --text-main: #334155;
-        --text-muted: #64748b;
-        --accent: #6366f1;
+        --primary: #6366f1;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --info: #0ea5e9;
+        --dark: #1e293b;
+        --bg-main: #f8fafc;
     }
 
     body {
         background-color: var(--bg-main);
-        color: var(--text-main);
-        font-family: 'Inter', -apple-system, sans-serif;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: var(--dark);
     }
 
-    /* --- Dashboard Cards --- */
     .card-dashboard {
-        border: none;
-        border-radius: 12px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        background: #fff;
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s ease;
     }
 
-    .icon-shape {
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
+    .card-dashboard:hover {
+        transform: translateY(-3px);
+    }
+
+    .icon-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.1rem;
+        font-size: 1.25rem;
     }
 
-    /* --- Pagination --- */
-    .custom-pagination {
-        display: flex;
-        align-items: center;
-        gap: 0;
-        border-radius: 6px;
-        overflow: hidden;
-        border: 1px solid #e2e8f0;
-    }
-
-    .page-link-custom {
-        padding: 6px 14px;
-        background: white;
-        border-right: 1px solid #e2e8f0;
-        color: #4f46e5;
-        text-decoration: none;
-        font-size: 0.85rem;
-    }
-
-    .page-link-custom:last-child { border-right: none; }
-
-    .page-link-custom.active {
-        background: #1e293b;
-        color: white;
-        border-color: #1e293b;
-    }
-
-    .page-link-custom.next-prev {
-        color: #4f46e5;
-        font-weight: 500;
-    }
-
-    /* --- Table & Chart --- */
-    .table-responsive {
+    .badge-soft {
+        font-weight: 600;
+        padding: 0.4em 0.8em;
         border-radius: 8px;
-        border: 1px solid #eef2f7;
     }
 
-    .table thead th {
-        background-color: #f8fafc;
-        text-transform: uppercase;
-        font-size: 0.7rem;        letter-spacing: 0.025em;
-        color: #64748b;
-        border-bottom: 1px solid #e2e8f0;
-    }
-
-    .chart-container {
-        height: 300px;
-        position: relative;
-    }
+    .bg-soft-success { background: #d1fae5; color: #065f46; }
+    .bg-soft-warning { background: #fef3c7; color: #92400e; }
+    .bg-soft-info { background: #e0f2fe; color: #075985; }
+    .bg-soft-secondary { background: #f1f5f9; color: #475569; }
 </style>
 
 <div class="container-fluid p-4">
     <div class="row align-items-center mb-4">
         <div class="col">
-            <h4 class="fw-bold mb-0">Overview Dashboard</h4>
-            <p class="text-muted small mb-0">Selamat datang kembali, Admin.</p>
+            <h3 class="fw-bold mb-1">Analytics Overview</h3>
+            <p class="text-muted mb-0">Lacak performa toko Anda secara real-time.</p>
         </div>
         <div class="col-auto">
-            <div class="bg-white border rounded-3 px-3 py-2 small fw-medium">
-                <i class="far fa-calendar me-2 text-primary"></i> {{ now()->format('d M Y') }}
+            <div class="bg-white border shadow-sm rounded-3 px-3 py-2 small fw-bold">
+                <i class="far fa-calendar-alt me-2 text-primary"></i> {{ now()->format('d M, Y') }}
             </div>
         </div>
     </div>
 
-    <div class="row g-3 mb-4">
+    {{-- Stats Row --}}
+    <div class="row g-4 mb-4">
         @php
             $stats_data = [
-                ['label' => 'Total Pendapatan', 'val' => 'Rp ' . number_format($stats['total_revenue'] ?? 0, 0, ',', '.'), 'icon' => 'fa-wallet', 'color' => '#4f46e5'],
-                ['label' => 'Pesanan Baru', 'val' => ($stats['pending_orders'] ?? 0) . ' Pesanan', 'icon' => 'fa-shopping-cart', 'color' => '#f59e0b'],
-                ['label' => 'Produk Aktif', 'val' => $stats['total_products'] ?? 58, 'icon' => 'fa-box', 'color' => '#10b981'],
-                ['label' => 'Pelanggan', 'val' => $stats['total_customers'] ?? 0, 'icon' => 'fa-users', 'color' => '#06b6d4'],
+                ['label' => 'Total Pendapatan', 'val' => 'Rp ' . number_format($stats['total_revenue'] ?? 0, 0, ',', '.'), 'icon' => 'fa-wallet', 'color' => 'var(--primary)', 'bg' => '#eef2ff'],
+                ['label' => 'Tertunda', 'val' => $stats['pending_orders'] ?? 0, 'icon' => 'fa-shopping-bag', 'color' => 'var(--warning)', 'bg' => '#fffbeb'],
+                ['label' => 'Produk Aktif', 'val' => $stats['total_products'] ?? 0, 'icon' => 'fa-box-open', 'color' => 'var(--success)', 'bg' => '#ecfdf5'],
+                ['label' => 'Total Pelanggan', 'val' => $stats['total_customers'] ?? 0, 'icon' => 'fa-user-friends', 'color' => 'var(--info)', 'bg' => '#f0f9ff'],
             ];
         @endphp
 
         @foreach($stats_data as $s)
         <div class="col-md-3">
-            <div class="card card-dashboard p-3">
+            <div class="card card-dashboard p-3 border-0">
                 <div class="d-flex align-items-center">
-                    <div class="icon-shape me-3" style="background-color: {{ $s['color'] }}15; color: {{ $s['color'] }};">
+                    <div class="icon-box me-3" style="background-color: {{ $s['bg'] }}; color: {{ $s['color'] }};">
                         <i class="fas {{ $s['icon'] }}"></i>
                     </div>
                     <div>
-                        <div class="text-muted small fw-medium text-uppercase mb-0" style="font-size: 0.65rem;">{{ $s['label'] }}</div>
-                        <div class="h6 fw-bold mb-0">{{ $s['val'] }}</div>
+                        <span class="text-muted small fw-bold text-uppercase" style="font-size: 0.7rem;">{{ $s['label'] }}</span>
+                        <h4 class="fw-bold mb-0 mt-1">{{ $s['val'] }}</h4>
                     </div>
                 </div>
             </div>
@@ -130,86 +96,79 @@
     </div>
 
     <div class="row">
+        {{-- Revenue Chart --}}
         <div class="col-lg-8 mb-4">
-            <div class="card card-dashboard p-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h6 class="fw-bold mb-0">Grafik Penjualan 7 Hari Terakhir</h6>
-                    <button class="btn btn-sm btn-light border text-muted px-3" style="font-size: 0.75rem;">Laporan Mingguan</button>
-                </div>
-                <div class="chart-container">
+            <div class="card card-dashboard p-4 h-100">
+                <h5 class="fw-bold mb-4">Revenue Trend</h5>
+                <div style="height: 300px;">
                     <canvas id="revenueChart"></canvas>
                 </div>
             </div>
         </div>
 
+        {{-- Top Selling Products --}}
         <div class="col-lg-4 mb-4">
-            <div class="card card-dashboard h-100 p-4">
-                <h6 class="fw-bold mb-4">Produk Terlaris</h6>
-                @forelse($topProducts ?? [] as $product)
-                <div class="d-flex align-items-center mb-3">
-                    <div class="flex-shrink-0 bg-light rounded-2 p-2 text-center" style="width: 40px;">
-                        <span class="small fw-bold text-primary">{{ substr($product->name, 0, 1) }}</span>
+            <div class="card card-dashboard p-4 h-100">
+                <h5 class="fw-bold mb-4">Top Selling</h5>
+                @forelse($topProducts as $product)
+                <div class="d-flex align-items-center mb-4">
+                    <div class="bg-primary bg-opacity-10 rounded-3 p-2 text-center fw-bold text-primary" style="width: 45px; height: 45px;">
+                        {{ substr($product->name, 0, 1) }}
                     </div>
                     <div class="ms-3 flex-grow-1">
-                        <div class="small fw-bold text-dark">{{ $product->name }}</div>
-                        <div class="text-muted" style="font-size: 0.7rem;">{{ $product->sold_count ?? 0 }} Terjual</div>
+                        <h6 class="fw-bold mb-0" style="font-size: 0.9rem;">{{ Str::limit($product->name, 20) }}</h6>
+                        <span class="text-muted small">{{ $product->sold_count ?? 0 }} sold</span>
                     </div>
-                    <div class="text-end small fw-bold">Rp{{ number_format($product->price ?? 0, 0, ',', '.') }}</div>
+                    <div class="text-end fw-bold text-success">
+                        Rp{{ number_format($product->price, 0, ',', '.') }}
+                    </div>
                 </div>
                 @empty
-                <div class="text-center py-5 text-muted small">Data tidak tersedia.</div>
+                <p class="text-center text-muted py-5">Belum ada data produk terjual.</p>
                 @endforelse
             </div>
         </div>
     </div>
 
-    <div class="card card-dashboard">
-        <div class="p-4 d-flex justify-content-between align-items-center">
-            <h6 class="fw-bold mb-0">Transaksi Terakhir</h6>
-            <div class="small text-muted">Showing {{ count($recentOrders ?? []) }} results</div>
+    {{-- Recent Transactions Table --}}
+    <div class="card card-dashboard overflow-hidden">
+        <div class="p-4 border-bottom bg-white">
+            <h5 class="fw-bold mb-0">Recent Transactions</h5>
         </div>
-        <div class="table-responsive px-4">
-            <table class="table align-middle mb-3">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
                 <thead>
-                    <tr>
-                        <th>ID Pesanan</th>
-                        <th>Nama Pelanggan</th>
-                        <th>Total Pembayaran</th>
+                    <tr class="table-light">
+                        <th class="ps-4">Order ID</th>
+                        <th>Customer</th>
+                        <th>Total</th>
                         <th class="text-center">Status</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($recentOrders ?? [] as $order)
+                    @forelse($recentOrders as $order)
                     <tr>
-                        <td class="fw-bold text-primary small">#{{ $order->order_number }}</td>
-                        <td class="small">{{ $order->user->name ?? 'Guest' }}</td>
-                        <td class="small fw-bold">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</td>
+                        <td class="ps-4 fw-bold">#{{ $order->order_number }}</td>
+                        <td>{{ $order->user->name ?? 'Guest' }}</td>
+                        <td class="fw-bold">Rp{{ number_format($order->total_amount, 0, ',', '.') }}</td>
                         <td class="text-center">
                             @php
                                 $status = strtolower($order->status);
-                                $badgeClass = 'bg-secondary';
-                                if($status == 'completed') $badgeClass = 'bg-success';
-                                elseif($status == 'processing') $badgeClass = 'bg-warning text-dark';
-                                elseif($status == 'pending') $badgeClass = 'bg-info text-dark';
+                                $badge = match($status) {
+                                    'completed', 'success' => 'bg-soft-success',
+                                    'pending' => 'bg-soft-warning',
+                                    'processing' => 'bg-soft-info',
+                                    default => 'bg-soft-secondary'
+                                };
                             @endphp
-                            <span class="badge rounded-pill {{ $badgeClass }} px-3" style="font-size: 0.65rem;">
-                                {{ strtoupper($order->status) }}
-                            </span>
+                            <span class="badge {{ $badge }} px-3">{{ strtoupper($order->status) }}</span>
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="4" class="text-center py-4">Belum ada pesanan masuk.</td></tr>
+                    <tr><td colspan="4" class="text-center py-5 text-muted">Belum ada transaksi.</td></tr>
                     @endforelse
                 </tbody>
             </table>
-        </div>
-        
-        <div class="p-4 pt-0 d-flex justify-content-between align-items-center mt-3">
-            <div class="small text-muted">Halaman 1 dari 1</div>
-            <div class="custom-pagination">
-                <a href="#" class="page-link-custom next-prev">Next &raquo;</a>
-                <a href="#" class="page-link-custom active">1</a>
-            </div>
         </div>
     </div>
 </div>
@@ -219,58 +178,33 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const ctx = document.getElementById('revenueChart').getContext('2d');
-        const rawData = @json($revenueChart ?? []);
+        const rawData = @json($revenueChart);
         
-        // Data dummy jika database kosong agar grafik tetap muncul garisnya
-        const labels = rawData.length > 0 ? rawData.map(item => item.date) : ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
-        const dataValues = rawData.length > 0 ? rawData.map(item => item.total) : [0, 50000, 30000, 100000, 80000, 150000, 120000];
-
-        // Membuat gradient untuk area di bawah garis
-        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, 'rgba(99, 102, 241, 0.4)');
-        gradient.addColorStop(1, 'rgba(99, 102, 241, 0)');
+        const labels = rawData.map(item => item.date);
+        const dataValues = rawData.map(item => item.total);
 
         new Chart(ctx, {
-            type: 'line', // Mengubah menjadi Line Chart
+            type: 'line',
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Pendapatan',
+                    label: 'Revenue',
                     data: dataValues,
-                    borderColor: '#6366f1', // Warna garis ungu terang
-                    backgroundColor: gradient, // Warna isi di bawah garis
-                    fill: true, // Mengaktifkan pengisian area
-                    tension: 0.4, // Membuat garis melengkung (smooth)
-                    borderWidth: 4, // Ketebalan garis
-                    pointRadius: 4, // Ukuran titik
-                    pointBackgroundColor: '#fff',
-                    pointBorderColor: '#6366f1',
-                    pointBorderWidth: 2,
-                    pointHoverRadius: 7
+                    borderColor: '#6366f1',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 3
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                    }
-                },
+                plugins: { legend: { display: false } },
                 scales: {
                     y: { 
                         beginAtZero: true,
-                        grid: { color: '#f1f5f9', drawBorder: false },
-                        ticks: { 
-                            font: { size: 11 },
-                            callback: val => 'Rp ' + val.toLocaleString('id-ID')
-                        }
-                    },
-                    x: { 
-                        grid: { display: false }, 
-                        ticks: { font: { size: 11 } } 
+                        ticks: { callback: val => 'Rp' + val.toLocaleString('id-ID') }
                     }
                 }
             }

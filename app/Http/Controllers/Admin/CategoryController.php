@@ -40,6 +40,8 @@ class CategoryController extends Controller
             'image' => 'nullable|image|max:1024',
             'is_active' => 'boolean',
         ]);
+    
+        $validated['is_active'] = $request->has('is_active');
 
         // 2. Handle Upload Gambar (Jika ada)
         if ($request->hasFile('image')) {
@@ -75,6 +77,8 @@ class CategoryController extends Controller
             'image' => 'nullable|image|max:1024',
             'is_active' => 'boolean',
         ]);
+
+     $validated['is_active'] = $request->has('is_active');
 
         // 2. Handle Ganti Gambar
         if ($request->hasFile('image')) {

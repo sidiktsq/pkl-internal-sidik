@@ -178,9 +178,12 @@
                             </span>
                         </td>
                         <td>
-                            <div class="fw-bold text-dark">Rp {{ number_format($product->price, 0, ',', '.') }}</div>
-                            @if($product->discount_price)
-                                <small class="text-danger text-decoration-line-through">Rp {{ number_format($product->discount_price, 0, ',', '.') }}</small>
+                            {{-- LOGIKA HARGA YANG DIPERBAIKI --}}
+                            @if($product->discount_price && $product->discount_price < $product->price)
+                                <div class="fw-bold text-dark">Rp {{ number_format($product->discount_price, 0, ',', '.') }}</div>
+                                <small class="text-danger text-decoration-line-through">Rp {{ number_format($product->price, 0, ',', '.') }}</small>
+                            @else
+                                <div class="fw-bold text-dark">Rp {{ number_format($product->price, 0, ',', '.') }}</div>
                             @endif
                         </td>
                         <td>
